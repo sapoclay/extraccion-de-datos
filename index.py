@@ -1,20 +1,31 @@
+# Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
-from tkinter import filedialog, messagebox
-import PyPDF2
-import docx
-import openpyxl
-import json
-import os
-from odf.opendocument import load
-from odf import text, teletype
-from bs4 import BeautifulSoup
 
+# Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
+from tkinter import filedialog, messagebox
+
+# Importa módulos para manejar diferentes tipos de archivos
+import PyPDF2  # Para archivos PDF
+import docx  # Para archivos Word
+import openpyxl  # Para archivos Excel
+import json  # Para archivos JSON
+import os  # Para interactuar con el sistema operativo
+
+# Importa módulos para trabajar con otros tipos de archivos
+from odf.opendocument import load  # Para archivos ODT
+from odf import text, teletype
+from bs4 import BeautifulSoup  # Para archivos HTML
+
+# Inicializa una variable global para almacenar el nombre del archivo
 nombre_archivo = ""
 
+# Función para leer un archivo y mostrar su contenido en un cuadro de texto
 def leer_archivo():
     global nombre_archivo
+    # Abre un cuadro de diálogo para seleccionar un archivo y almacena su nombre en la variable 'nombre_archivo'
     nombre_archivo = filedialog.askopenfilename()
     try:
+        # Determina el tipo de archivo basado en su extensión y procesa el contenido correspondiente
         if nombre_archivo.endswith('.txt'):
             with open(nombre_archivo, 'r') as archivo:
                 contenido = archivo.read()
@@ -62,6 +73,7 @@ def leer_archivo():
     except FileNotFoundError:
         print("El archivo especificado no se encontró.")
 
+# Función para leer archivos ODT y extraer su contenido
 def leer_archivo_odt(nombre_archivo):
     doc = load(nombre_archivo)
     contenido = ''
@@ -69,21 +81,24 @@ def leer_archivo_odt(nombre_archivo):
         contenido += teletype.extractText(para) + '\n'
     return contenido
 
+# Función para leer archivos CSV y extraer su contenido
 def leer_archivo_csv(nombre_archivo):
     with open(nombre_archivo, 'r') as archivo_csv:
-        contenido = archivo_csv.read()
+        contenido = archivo_csv.read() # Lee el contenido del archivo CSV
     return contenido
 
+# Función para leer archivos HTML y extraer su contenido
 def leer_archivo_html(nombre_archivo):
     with open(nombre_archivo, 'r') as archivo_html:
-        contenido = archivo_html.read()
+        contenido = archivo_html.read() # Lee el contenido del archivo HTML
         soup = BeautifulSoup(contenido, 'html.parser')
-        return soup.get_text()
+        return soup.get_text() # Devuelve el texto extraído del archivo HTML
 
+# Función para seleccionar una porción de texto y agregarla a un archivo JSON
 def seleccionar_porcion():
     global nombre_archivo
-    contenido = text_box.get("1.0", "end-1c")
-    inicio = entry_inicio.get()
+    contenido = text_box.get("1.0", "end-1c") # Obtiene todo el contenido del cuadro de texto
+    inicio = entry_inicio.get()  # Obtiene la cadena de búsqueda ingresada por el usuario
 
     if nombre_archivo:
         # Verificar si el texto buscado está presente en el contenido
@@ -128,7 +143,7 @@ def seleccionar_porcion():
         print("Por favor, abre un archivo primero.")
 
 def limpiar_busqueda():
-    entry_inicio.delete(0, tk.END)
+    entry_inicio.delete(0, tk.END) # Borra la entrada de búsqueda
     text_box_porcion.delete('1.0', tk.END)  # Borrar contenido de la caja de texto para la porción
 
 # Crear la ventana principal
@@ -139,11 +154,11 @@ root.title("Seleccionar información de un Archivo")
 btn_abrir_archivo = tk.Button(root, text="Abrir Archivo", command=leer_archivo)
 btn_abrir_archivo.pack(pady=5)
 
-# Textbox para mostrar contenido del archivo
+# Cuadro de texto para mostrar el contenido del archivo seleccionado
 text_box = tk.Text(root, height=15, width=50)
 text_box.pack(pady=5)
 
-# Entrada para inicio de porción
+# Etiqueta y entrada para la búsqueda de porciones de texto
 lbl_inicio = tk.Label(root, text="Búsqueda:")
 lbl_inicio.pack()
 entry_inicio = tk.Entry(root)
