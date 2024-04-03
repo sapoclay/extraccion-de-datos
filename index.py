@@ -1,3 +1,5 @@
+# Importa la conexión a la BD
+import conexion
 # Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
 
@@ -146,6 +148,9 @@ def limpiar_busqueda():
     entry_inicio.delete(0, tk.END) # Borra la entrada de búsqueda
     text_box_porcion.delete('1.0', tk.END)  # Borrar contenido de la caja de texto para la porción
 
+def insertar_en_bd_desde_json():
+    conexion.insertar_en_bd_desde_json()
+
 # Crear la ventana principal
 root = tk.Tk()
 root.title("Seleccionar información de un Archivo")
@@ -175,6 +180,10 @@ btn_seleccionar_porcion.pack(pady=5)
 # Textbox para mostrar porción seleccionada
 text_box_porcion = tk.Text(root, height=5, width=50)
 text_box_porcion.pack(pady=5)
+
+# Botón para insertar datos en la base de datos desde el archivo JSON
+btn_insertar_bd_desde_json = tk.Button(root, text="Insertar en Base de Datos desde JSON", command=insertar_en_bd_desde_json)
+btn_insertar_bd_desde_json.pack(pady=5)
 
 # Ejecutar la ventana principal
 root.mainloop()
