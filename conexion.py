@@ -12,17 +12,6 @@ def conectar_bd():
     )
     return conn
 
-def crear_tabla():
-    # Crear una tabla en la base de datos si no existe
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS datos (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        archivo VARCHAR(255),
-                        contenido TEXT)''')
-    conn.commit()
-    conn.close()
-
 def insertar_en_bd_desde_json():
     try:
         conn = conectar_bd()
