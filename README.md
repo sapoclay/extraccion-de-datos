@@ -13,8 +13,13 @@ Una vez encontrado el texto buscado, aparecerá un aviso de que el texto se va a
 
 En el momento que quieras escribir los datos en la base de datos, solo es necesario pulsar sobre el botón "Insertar en Base de Datos desde JSON". Los datos de la conexión a la base de datos habrá que definirlos dentro del archivo conexion.py. En caso
 de que la tabla no exista, esta se creará automáticamente. Después se añadirán los datos del archivo json en un registro en la base de datos. Cada regustro se va a diferenciar según el nombre del archivo cargado en el programa Python. 
-En caso de que añadamos el texto de un archivo, después el de otro, y volvamos a abrir el primero de los archivos y añadamos más texto a la base de datos, se actualizará el registro de datos del primer archivo, por lo que no deberían generarse 
-duplicados en la base de datos.
+En caso de que añadamos el texto de un archivo, después el de otro, y volvamos a abrir el primero de los archivos y añadamos más texto a la base de datos, se actualizará el registro de datos del primer archivo, por lo que no deberían generarse duplicados en la base de datos.
+
+También he añadido un botón que muestra los datos guardados en la base de datos. Cada registro es independendiente del resto, y dentro del registro (recordemos que están separados por el nombre del archivo desde el que se toman los datos) en caso de que alguno de los datos guardados sea Coordenadas: o coordenadas: se va a generar un botón para abrir las coordenadas en google maps. En caso de que no encuentre entre los datos ninguna de esas referencias a las coordenadas, no se mostrará el botón para ver en google maps.
+
+Además, a cada registro de la base de datos, he añadido un nuevo botón para poder dejar notas relacionadas con el registro en cuestión al que esté asociada la nota. En caso de que la nota ya esté creada, al pulsar sobre este botón permitirá leerla.
+
+He corregido también la capacidad de estirar o encoger los cuadros de texto en los que se muestra el archivo sobre el que va a trabajar el usuario, y eso también se aplica a los cuadros de texto que muestra el contenido de la base de datos.
 
 ## Dependencias
 Las dependencias necesarias para que funcione este proyecto son:

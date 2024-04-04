@@ -1,13 +1,15 @@
 import mysql.connector
 import json
 import tkinter.messagebox as messagebox
+import webbrowser
+
 
 def conectar_bd():
-    # Conectar a la base de datos MySQL. Aquí hay que configurar los datos de tu conexión
+    # Conectar a la base de datos MySQL. Aquí hay que configurar los datos de tu conexión a la BD
     conn = mysql.connector.connect(
         host="localhost",
-        user="XXX",
-        password="XXXX",
+        user="root",
+        password="36159152",
         database="extraccion_datos"
     )
     return conn
@@ -27,22 +29,22 @@ def insertar_en_bd_desde_json():
         with open('porcion.json', 'r') as f:
             data = json.load(f)
         
-        # Obtener los datos existentes en la base de datos
-        cursor.execute("SELECT archivo, contenido FROM datos")
-        registros_exist = {archivo: contenido for archivo, contenido in cursor.fetchall()}
-        
         # Insertar o actualizar datos en la base de datos
         for archivo, contenidos in data.items():
-            for contenido in contenidos:
-                # Verificar si el archivo ya existe en la base de datos
-                if archivo in registros_exist:
-                    # Si el contenido es diferente al de la base de datos, agregar el contenido nuevo
-                    if contenido not in registros_exist[archivo]:
-                        nuevo_contenido = registros_exist[archivo] + "\n" + contenido
-                        cursor.execute("UPDATE datos SET contenido = %s WHERE archivo = %s", (nuevo_contenido, archivo))
-                else:
-                    # Si el archivo no existe en la base de datos, insertar
-                    cursor.execute("INSERT INTO datos (archivo, contenido) VALUES (%s, %s)", (archivo, contenido))
+            # Obtener el contenido existente para el archivo, si existe
+            cursor.execute("SELECT contenido FROM datos WHERE archivo = %s", (archivo,))
+            registro_existente = cursor.fetchone()
+            contenido_existente = registro_existente[0] if registro_existente else None
+            
+            # Si el contenido existe, verificar y agregar solo contenido nuevo
+            if contenido_existente:
+                nuevo_contenido = contenido_existente
+                for contenido_nuevo in contenidos:
+                    if contenido_nuevo not in contenido_existente:
+                        nuevo_contenido += "\n" + contenido_nuevo
+                cursor.execute("UPDATE datos SET contenido = %s WHERE archivo = %s", (nuevo_contenido, archivo))
+            else:
+                cursor.execute("INSERT INTO datos (archivo, contenido) VALUES (%s, %s)", (archivo, "\n".join(contenidos)))
         
         conn.commit()
         conn.close()
@@ -50,3 +52,75 @@ def insertar_en_bd_desde_json():
         messagebox.showinfo("Éxito", "Los datos fueron insertados/actualizados en la base de datos correctamente.")
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al insertar/actualizar los datos en la base de datos: {str(e)}")
+        
+# Función para mostrar el contenido guardado en la base de datos
+def obtener_contenido_bd():
+    try:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT archivo, contenido FROM datos")
+        registros = cursor.fetchall()
+
+        conn.close()
+
+        return registros
+    except Exception as e:
+        print(f"Error al obtener el contenido de la base de datos: {str(e)}")
+        return None
+
+def abrir_google_maps(latitud, longitud):
+    try:
+        # Extraer solo las coordenadas del texto
+        coordenadas = f"{latitud},{longitud}"
+        # Construir la URL de Google Maps solo con las coordenadas
+        url = f"https://www.google.com/maps/search/?api=1&query={coordenadas}"
+        # Abrir la URL en el navegador web predeterminado
+        webbrowser.open_new(url)
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al abrir Google Maps: {str(e)}")
+        
+        
+def obtener_coordenadas(contenido):
+    # Buscar el formato de coordenadas en el contenido
+    index_latitud = contenido.find("Coordenadas:")
+    if index_latitud == -1:
+        index_latitud = contenido.find("coordenadas:")
+    if index_latitud != -1:
+        index_coma = contenido.find(",", index_latitud)
+        if index_coma != -1:
+            # Extraer la latitud y la longitud
+            latitud = contenido[index_latitud + len("Coordenadas:"):index_coma].strip()
+            longitud = contenido[index_coma + 1:].strip()
+            return latitud, longitud
+    return None, None
+
+# Función para guardar la nota en la base de datos
+def guardar_nota_en_bd(archivo, nota):
+    try:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        # Actualizar la nota en la base de datos
+        cursor.execute("UPDATE datos SET nota = %s WHERE archivo = %s", (nota, archivo))
+        conn.commit()
+        conn.close()
+        messagebox.showinfo("Nota Guardada", "Nota guardada en la base de datos.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al guardar la nota en la base de datos: {str(e)}")
+
+# Función para obtener la nota asociada al archivo desde la base de datos
+def obtener_nota_desde_bd(archivo):
+    try:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        # Obtener la nota desde la base de datos
+        cursor.execute("SELECT nota FROM datos WHERE archivo = %s", (archivo,))
+        nota = cursor.fetchone()
+        conn.close()
+        if nota:
+            return nota[0]
+        else:
+            return None
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al obtener la nota desde la base de datos: {str(e)}")
+        return None

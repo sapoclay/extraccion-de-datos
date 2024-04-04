@@ -1,9 +1,17 @@
 {
-    "IFCT0510_ficha": [
-        "IFC152_3 GESTIÓN DE SISTEMAS ",
-        "UC0486_3 Asegurar equipos informáticos "
+    "Cosas": [
+        "Coordenadas: 42.253041160816025, -8.680791062208328",
+        "Nombre: Perico",
+        "Nombre: Perico"
     ],
-    "Seguridad-Informática": [
-        "CAPÍTULO 1. GESTIÓN DE LA SEGURIDAD INFORMÁTICA ........... 15  "
+    "Currículum_Damián_Amoedo_Garrido": [
+        "Nombre: Damián",
+        "coordenadas: 42.27010261437387, -8.670045609537228",
+        "Apellidos: Amoedo Garrido",
+        "Dirección: Camiño das Mimosas nº5. Piso 2º. San Fausto, Chapela"
+    ],
+    "FicheroCliente": [
+        "FECHA ORIGEN:21-07-2023               160,75 EUR           21-07-2023              160,75",
+        "IBAN ES25 2080 5103 3630 0005 5624"
     ]
 }

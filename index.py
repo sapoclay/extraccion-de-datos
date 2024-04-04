@@ -2,6 +2,8 @@
 import conexion
 # Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
+# Importa la biblioteca para abrir el navegador web
+import webbrowser
 
 # Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
 from tkinter import filedialog, messagebox
@@ -17,6 +19,7 @@ import os  # Para interactuar con el sistema operativo
 from odf.opendocument import load  # Para archivos ODT
 from odf import text, teletype
 from bs4 import BeautifulSoup  # Para archivos HTML
+
 
 # Inicializa una variable global para almacenar el nombre del archivo
 nombre_archivo = ""
@@ -151,6 +154,115 @@ def limpiar_busqueda():
 def insertar_en_bd_desde_json():
     conexion.insertar_en_bd_desde_json()
 
+# Función para mostrar el contenido de la base de datos
+def ver_contenido_bd():
+    try:
+        registros = conexion.obtener_contenido_bd()
+        if registros:
+            ventana = tk.Toplevel(root)
+            ventana.title("Contenido de la Base de Datos")
+
+            # Crear una barra de desplazamiento vertical para la ventana principal
+            scrollbar = tk.Scrollbar(ventana)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            for archivo, contenido in registros:
+                # Cuadro de texto para mostrar el contenido de cada archivo
+                text_box_bd = tk.Text(ventana, width=50)
+
+                # Contar el número de líneas en el contenido y ajustar la altura
+                num_lineas = contenido.count('\n') + 3
+                text_box_bd.config(height=num_lineas)
+
+                text_box_bd.pack(pady=5, fill=tk.BOTH, expand=True)  # Rellenar la ventana y expandirse
+
+                # Insertar contenido
+                text_box_bd.insert(tk.END, f"Archivo: {archivo}\nContenido: {contenido}\n\n")
+
+                # Verificar si el contenido contiene coordenadas
+                if "Coordenadas:" in contenido or "coordenadas:" in contenido:
+                    # Obtener las coordenadas
+                    latitud, longitud = conexion.obtener_coordenadas(contenido)
+                    # Mostrar el botón solo si se encuentran coordenadas
+                    if latitud and longitud:
+                        btn_abrir_mapa = tk.Button(ventana, text="Ver Coordenadas en Google Maps",
+                                                   command=lambda lat=latitud, lon=longitud: conexion.abrir_google_maps(lat, lon))
+                        btn_abrir_mapa.pack(pady=5)
+
+                # Botón para ver/añadir nota
+                btn_nota = tk.Button(ventana, text="Ver/Añadir Nota", command=lambda arch=archivo: abrir_ventana_nota(arch))
+                btn_nota.pack(pady=5)
+
+                # Configurar la barra de desplazamiento para que se desplace con el texto
+                text_box_bd.config(yscrollcommand=scrollbar.set)
+
+            # Configurar la barra de desplazamiento para que se mueva con el texto
+            scrollbar.config(command=text_box_bd.yview)
+
+            # Configurar el tamaño de la ventana para que se ajuste automáticamente al contenido
+            ventana.update_idletasks()  # Actualizar la ventana para obtener el tamaño correcto
+            ventana.geometry(f"{ventana.winfo_reqwidth()}x{ventana.winfo_reqheight()}")
+
+            ventana.mainloop()
+        else:
+            messagebox.showinfo("Información", "No se encontraron registros en la base de datos.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al obtener el contenido de la base de datos: {str(e)}")
+
+
+def obtener_coordenadas(contenido):
+    # Dividir el contenido en líneas
+    lineas = contenido.split('\n')
+    for linea in lineas:
+        # Buscar la línea que contiene las coordenadas
+        if "Coordenadas:" in linea or "coordenadas:" in linea:
+            # Dividir la línea en partes usando ':'
+            partes = linea.split(':')
+            if len(partes) == 2:  # Verificar si hay dos partes separadas por ':'
+                # Obtener las coordenadas de latitud y longitud
+                coordenadas = partes[1].strip()
+                if ',' in coordenadas:
+                    latitud, longitud = coordenadas.split(',')
+                    return latitud.strip(), longitud.strip()
+    return None, None  # Devolver None si no se encuentran coordenadas
+
+
+# Función para abrir la ventana de agregar nota
+def abrir_ventana_nota(archivo):
+    # Función para guardar la nota en la base de datos
+    def guardar_nota():
+        nota = text_nota.get("1.0", tk.END).strip()
+        if nota:
+            # Guardar la nota en la base de datos asociada al archivo
+            conexion.guardar_nota_en_bd(archivo, nota)
+            ventana_nota.destroy()
+        else:
+            messagebox.showwarning("Advertencia", "Por favor, ingresa una nota.")
+
+    # Verificar si ya existe una nota asociada al archivo en la base de datos
+    nota_existente = conexion.obtener_nota_desde_bd(archivo)
+
+    # Crear la ventana de agregar nota
+    ventana_nota = tk.Toplevel(root)
+    ventana_nota.title("Agregar Nota")
+
+    # Etiqueta y cuadro de texto para ingresar la nota
+    label_nota = tk.Label(ventana_nota, text="Nota:")
+    label_nota.pack()
+
+    text_nota = tk.Text(ventana_nota, height=5, width=50)
+    text_nota.pack()
+
+    if nota_existente:
+        text_nota.insert(tk.END, nota_existente)
+
+    # Botón para guardar la nota
+    btn_guardar_nota = tk.Button(ventana_nota, text="Guardar Nota", command=guardar_nota)
+    btn_guardar_nota.pack(pady=5)
+
+
+
+
 # Crear la ventana principal
 root = tk.Tk()
 root.title("Seleccionar información de un Archivo")
@@ -160,8 +272,9 @@ btn_abrir_archivo = tk.Button(root, text="Abrir Archivo", command=leer_archivo)
 btn_abrir_archivo.pack(pady=5)
 
 # Cuadro de texto para mostrar el contenido del archivo seleccionado
-text_box = tk.Text(root, height=15, width=50)
-text_box.pack(pady=5)
+text_box = tk.Text(root, height=20, width=50) 
+text_box.pack(pady=5, fill=tk.BOTH, expand=True)
+
 
 # Etiqueta y entrada para la búsqueda de porciones de texto
 lbl_inicio = tk.Label(root, text="Búsqueda:")
@@ -179,11 +292,15 @@ btn_seleccionar_porcion.pack(pady=5)
 
 # Textbox para mostrar porción seleccionada
 text_box_porcion = tk.Text(root, height=5, width=50)
-text_box_porcion.pack(pady=5)
+text_box_porcion.pack(pady=5, fill=tk.BOTH, expand=True)
 
 # Botón para insertar datos en la base de datos desde el archivo JSON
 btn_insertar_bd_desde_json = tk.Button(root, text="Insertar en Base de Datos desde JSON", command=insertar_en_bd_desde_json)
 btn_insertar_bd_desde_json.pack(pady=5)
+
+# Botón para ver el contenido de la base de datos
+btn_ver_contenido_bd = tk.Button(root, text="Ver Contenido de la Base de Datos", command=ver_contenido_bd)
+btn_ver_contenido_bd.pack(pady=5)
 
 # Ejecutar la ventana principal
 root.mainloop()
