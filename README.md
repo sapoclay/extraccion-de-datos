@@ -26,9 +26,12 @@ En caso de que añadamos el texto de un archivo, después el de otro, y volvamos
 - Se ha corregido la respuesta de script cuando se pulsa alguno de los botones sin haber abierto un documento de los permitidos. Ahora muestra un error mediante ventana emergente.
 - También se añadió un menú superior. Ahora para abrir un documento hay que ir a la opción Archivo. Se elimino el botón que había en la pantalla principal del script para abrir un archivo.
 - Como opciones de la opción Archivo, se ha añadido la posibilidad de exportar la base de datos como archivo .CSV y .PDF. Se guardarán los tres campos que tiene la base de datos ("archivo","contenido" y "notas"). A la opción Archivo, también le añadí una opción para cerrar el programa.
+- Las funciones para exportar la BD a CSV y PDF se han movido a un archivo independiente.
+- La función para mostrar la ventana del about, también se ha movido a un archivo independiente.
 - Además en el menú superior, ahora tiene una opción About (no sirve de nada, pero ahí la está).
 - Se ha corregido el problema que aparecía cuando se guardaban unas coordenadas en la base de datos y se intentaban abrir en Google Maps, pues si había más registros guardados después de las coordenadas estos se cargaban como parte de la URL en el mapa, por lo que no realizaba su función.
 - También se ha corregido el error que aparecía al eliminar una nota ya existente, pues el script no permitía eliminar una nota y dejar este campo vacío. Ahora ya se puede eliminar el contenido de la nota asociada a uno de los registros.
+- Se ha solucionado el problema de que la ventana que muestra el contenido de la base de datos, se actualizaba automáticamente cuando se añadía o se eliminaba una nota.
 
 
 ## Dependencias

@@ -8,8 +8,8 @@ def conectar_bd():
     # Conectar a la base de datos MySQL. Aquí hay que configurar los datos de tu conexión a la BD
     conn = mysql.connector.connect(
         host="localhost",
-        user="XXXX",
-        password="XXXX",
+        user="root",
+        password="36159152",
         database="extraccion_datos"
     )
     return conn
