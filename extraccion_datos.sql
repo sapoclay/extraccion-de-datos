@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 04-04-2024 a las 21:16:07
+-- Tiempo de generación: 05-04-2024 a las 10:22:32
 -- Versión del servidor: 8.0.36-0ubuntu0.22.04.1
 -- Versión de PHP: 8.1.2-1ubuntu2.14
 
@@ -31,7 +31,7 @@ CREATE TABLE `datos` (
   `id` int NOT NULL,
   `archivo` varchar(255) COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `contenido` text COLLATE utf8mb4_spanish_ci,
-  `nota` text CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci
+  `notas` varchar(255) COLLATE utf8mb4_spanish_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 --
@@ -52,7 +52,7 @@ ALTER TABLE `datos`
 -- AUTO_INCREMENT de la tabla `datos`
 --
 ALTER TABLE `datos`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
