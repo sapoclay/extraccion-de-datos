@@ -36,28 +36,55 @@ Las dependencias necesarias para que funcione este proyecto son:
 
     - Conexión a la base de datos en el archivo conexion.py: 
         - mysql-connector-python: Este módulo te permite conectar tu aplicación Python a una base de datos MySQL. Puedes instalarlo usando pip:
-         ```bash pip3 install mysql-connector-python ```
+         ```
+         bash pip3 install mysql-connector-python 
+         ```
         - json: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
         - tkinter.messagebox: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
         - webbrowser: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
 
     - Interfaz gráfica (Tkinter):
-        - En sistemas basados en Debian/Ubuntu: ```bash sudo apt-get install python3-tk```
-        - En sistemas basados en Fedora: ```bash sudo dnf install python3-tkinter```
+        - En sistemas basados en Debian/Ubuntu: 
+        ```
+        bash sudo apt-get install python3-tk
+        ```
+        - En sistemas basados en Fedora: 
+        ```
+        bash sudo dnf install python3-tkinter
+        ```
         - En sistemas basados en Windows y macOS, no se requiere ninguna instalación adicional, ya que Tkinter generalmente se instala junto con Python.
 
     - Imágenes (Pillow):
-        - Ejecuta: ```bash pip3 install Pillow``` para instalar la biblioteca Pillow. Esto solo vale para mostrar la imagen del menú about. Pero quizás habría que pensar en permitir trabajar con imágenes al este script.
+        - Ejecuta: 
+        ```
+        bash pip3 install Pillow
+        ``` 
+        para instalar la biblioteca Pillow. Esto solo vale para mostrar la imagen del menú about. Pero quizás habría que pensar en permitir trabajar con imágenes al este script.
 
     - Manipulación de archivos de diferentes formatos:
-        - Para PyPDF2: ```bash pip3 install PyPDF2```
-        - Para docx: ```bash pip3 install python-docx```
-        - Para openpyxl: ```bash pip3 install openpyxl```
-        - Para BeautifulSoup: ```bash pip3 install beautifulsoup4```
+        - Para PyPDF2: 
+        ```
+        bash pip3 install PyPDF2
+        ```
+        - Para docx: 
+        ```
+        bash pip3 install python-docx
+        ```
+        - Para openpyxl: 
+        ```
+        bash pip3 install openpyxl
+        ```
+        - Para BeautifulSoup: 
+        ```
+        bash pip3 install beautifulsoup4
+        ```
 
     - Exportar a CSV y PDF:
-        - Para CSV (incluido en la biblioteca estándar de Python): No se requiere instalación adicional.
-        - Para FPDF: ```bash pip3 install fpdf```
+        - Para CSV (creo que estaba incluido en la biblioteca estándar de Python, por lo que no debería requerir instalación adicional)
+        - Para FPDF: 
+        ```
+        bash pip3 install fpdf
+        ```
 
 Asegúrate de tener Python 3 y pip3 instalados en tu sistema antes de ejecutar los comandos de instalación mencionados anteriormente. Puedes encontrar más información sobre cómo instalar Python3 y pip3 en la documentación oficial de Python: https://www.python.org/doc/.
 
