@@ -42,15 +42,15 @@ Las dependencias necesarias para que funcione este proyecto son:
         - webbrowser: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
 
     - Interfaz gráfica (Tkinter):
-        - En sistemas basados en Debian/Ubuntu: ```bash sudo apt-get install python3-tk ```
-        - En sistemas basados en Fedora: ```bash sudo dnf install python3-tkinter ```
+        - En sistemas basados en Debian/Ubuntu: ```bash sudo apt-get install python3-tk```
+        - En sistemas basados en Fedora: ```bash sudo dnf install python3-tkinter```
         - En sistemas basados en Windows y macOS, no se requiere ninguna instalación adicional, ya que Tkinter generalmente se instala junto con Python.
 
     - Imágenes (Pillow):
-        - Ejecuta: ```bash pip3 install Pillow ``` para instalar la biblioteca Pillow. Esto solo vale para mostrar la imagen del menú about. Pero quizás habría que pensar en permitir trabajar con imágenes al este script.
+        - Ejecuta: ```bash pip3 install Pillow``` para instalar la biblioteca Pillow. Esto solo vale para mostrar la imagen del menú about. Pero quizás habría que pensar en permitir trabajar con imágenes al este script.
 
     - Manipulación de archivos de diferentes formatos:
-        - Para PyPDF2: ```bash pip3 install PyPDF2 ```
+        - Para PyPDF2: ```bash pip3 install PyPDF2```
         - Para docx: ```bash pip3 install python-docx```
         - Para openpyxl: ```bash pip3 install openpyxl```
         - Para BeautifulSoup: ```bash pip3 install beautifulsoup4```
