@@ -28,6 +28,7 @@ En caso de que añadamos el texto de un archivo, después el de otro, y volvamos
 - Como opciones de la opción Archivo, se ha añadido la posibilidad de exportar la base de datos como archivo .CSV y .PDF. Se guardarán los tres campos que tiene la base de datos ("archivo","contenido" y "notas"). A la opción Archivo, también le añadí una opción para cerrar el programa.
 - Las funciones para exportar la BD a CSV y PDF se han movido a un archivo independiente.
 - La función para mostrar la ventana del about, también se ha movido a un archivo independiente.
+- Las funciones para abrir las coordenadas en Google Maps y para separar los datos de las coordenadas de todos los datos recuperados de la BD se han movido a un archivo independiente.
 - Además en el menú superior, ahora tiene una opción About (no sirve de nada, pero ahí la está).
 - Se ha corregido el problema que aparecía cuando se guardaban unas coordenadas en la base de datos y se intentaban abrir en Google Maps, pues si había más registros guardados después de las coordenadas estos se cargaban como parte de la URL en el mapa, por lo que no realizaba su función.
 - También se ha corregido el error que aparecía al eliminar una nota ya existente, pues el script no permitía eliminar una nota y dejar este campo vacío. Ahora ya se puede eliminar el contenido de la nota asociada a uno de los registros.

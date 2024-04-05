@@ -4,6 +4,8 @@ import conexion
 import exportarBD
 # Importamos la función para mostrar el menú about
 import mostrar_about
+# Importamos la función para abrir las coordenadas en google maps desde el navegador web
+import google_maps
 # Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
 # Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
@@ -201,22 +203,22 @@ def ver_contenido_bd():
                 text_box_bd.pack(pady=5, fill=tk.BOTH, expand=True)  # Rellenar la ventana y expandirse
 
                 # Insertar contenido
-                text_box_bd.insert(tk.END, f"Archivo: {archivo}\nContenido: {contenido}")
+                text_box_bd.insert(tk.END, f"Archivo: {archivo}\n{contenido}")
 
                 # Verificar si hay notas y mostrarlas si existen
                 if notas is not None:
-                    text_box_bd.insert(tk.END, f"\nNotas: {notas}\n")
+                    text_box_bd.insert(tk.END, f"\nNota: {notas}\n")
                 else:
                     text_box_bd.insert(tk.END, "\n")
 
                 # Verificar si el contenido contiene coordenadas
                 if "Coordenadas:" in contenido or "coordenadas:" in contenido:
                     # Obtener las coordenadas
-                    latitud, longitud = conexion.obtener_coordenadas(contenido)
+                    latitud, longitud = google_maps.obtener_coordenadas(contenido)
                     # Mostrar el botón solo si se encuentran coordenadas
                     if latitud and longitud:
                         btn_abrir_mapa = tk.Button(ventana_contenido_bd, text="Ver Coordenadas en Google Maps",
-                                                   command=lambda lat=latitud, lon=longitud: conexion.abrir_google_maps(lat, lon))
+                                                   command=lambda lat=latitud, lon=longitud: google_maps.abrir_google_maps(lat, lon))
                         btn_abrir_mapa.pack(pady=5)
 
                 # Botón para ver/añadir nota
@@ -236,23 +238,6 @@ def ver_contenido_bd():
             messagebox.showinfo("Información", "No se encontraron registros en la base de datos.")
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al obtener el contenido de la base de datos: {str(e)}")
-
-def obtener_coordenadas(contenido):
-    # Dividir el contenido en líneas
-    lineas = contenido.split('\n')
-    for linea in lineas:
-        # Buscar la línea que contiene las coordenadas
-        if "Coordenadas:" in linea or "coordenadas:" in linea:
-            # Dividir la línea en partes usando ':'
-            partes = linea.split(':')
-            if len(partes) == 2:  # Verificar si hay dos partes separadas por ':'
-                # Obtener las coordenadas de latitud y longitud
-                coordenadas = partes[1].strip()
-                if ',' in coordenadas:
-                    latitud, longitud = coordenadas.split(',')
-                    return latitud.strip(), longitud.strip()
-    return None, None  # Devolver None si no se encuentran coordenadas
-
 
 def abrir_ventana_nota(archivo):
     # Función para guardar la nota en la base de datos
