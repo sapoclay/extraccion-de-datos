@@ -15,24 +15,51 @@ En el momento que quieras escribir los datos en la base de datos, solo es necesa
 de que la tabla no exista, esta se creará automáticamente. Después se añadirán los datos del archivo json en un registro en la base de datos. Cada regustro se va a diferenciar según el nombre del archivo cargado en el programa Python. 
 En caso de que añadamos el texto de un archivo, después el de otro, y volvamos a abrir el primero de los archivos y añadamos más texto a la base de datos, se actualizará el registro de datos del primer archivo, por lo que no deberían generarse duplicados en la base de datos.
 
-También he añadido un botón que muestra los datos guardados en la base de datos. Cada registro es independendiente del resto, y dentro del registro (recordemos que están separados por el nombre del archivo desde el que se toman los datos) en caso de que alguno de los datos guardados sea Coordenadas: o coordenadas: se va a generar un botón para abrir las coordenadas en google maps. En caso de que no encuentre entre los datos ninguna de esas referencias a las coordenadas, no se mostrará el botón para ver en google maps.
+## 1 Actualización
 
-Además, a cada registro de la base de datos, he añadido un nuevo botón para poder dejar notas relacionadas con el registro en cuestión al que esté asociada la nota. En caso de que la nota ya esté creada, al pulsar sobre este botón permitirá leerla.
+- He añadido un botón que muestra los datos guardados en la base de datos. Cada registro es independendiente del resto, y dentro del registro (recordemos que están separados por el nombre del archivo desde el que se toman los datos) en caso de que alguno de los datos guardados sea Coordenadas: o coordenadas: se va a generar un botón para abrir las coordenadas en google maps. En caso de que no encuentre entre los datos ninguna de esas referencias a las coordenadas, no se mostrará el botón para ver en google maps.
+- Además, a cada registro de la base de datos, he añadido un nuevo botón para poder dejar notas relacionadas con el registro en cuestión al que esté asociada la nota. En caso de que la nota ya esté creada, al pulsar sobre este botón permitirá leerla.
+- He corregido también la capacidad de estirar o encoger los cuadros de texto en los que se muestra el archivo sobre el que va a trabajar el usuario, y eso también se aplica a los cuadros de texto que muestra el contenido de la base de datos.
 
-He corregido también la capacidad de estirar o encoger los cuadros de texto en los que se muestra el archivo sobre el que va a trabajar el usuario, y eso también se aplica a los cuadros de texto que muestra el contenido de la base de datos.
+## 2 Actualización
+
+- Se ha corregido la respuesta de script cuando se pulsa alguno de los botones sin haber abierto un documento de los permitidos. Ahora muestra un error mediante ventana emergente.
+- También se añadió un menú superior. Ahora para abrir un documento hay que ir a la opción Archivo. Se elimino el botón que había en la pantalla principal del script.
+- Como opciones de la opción Archivo, se ha añadido la posibilidad de exportar la base de datos como archivo .CSV y .PDF. Se guardarán los tres campos que tiene la base de datos ("archivo","contenido" y "notas"). A la opción Archivo, también le añadí una opción para cerrar el programa.
+- Además en el menú superior, añadí una opción About.
+- Se ha corregido el problema que aparecía cuando se guardaban unas coordenadas en la base de datos y se intentaban abrir en Google Maps, pues si había más registros guardados después de las coordenadas estos se cargaban como parte de la URL en el mapa, por lo que no realizaba su función.
+- También se ha corregido el error que aparecía al eliminar una nota ya existente, pues el script no permitía eliminar una nota y dejar este campo vacío. Ahora ya se puede eliminar el contenido de la nota asociada a uno de los registros.
+
 
 ## Dependencias
 Las dependencias necesarias para que funcione este proyecto son:
 
-- MySQL Connector: Para conectar y comunicarse con la base de datos MySQL.
-- tkinter: Para crear la interfaz gráfica de usuario (GUI).
-- PyPDF2: Para manejar archivos PDF.
-- python-docx: Para trabajar con archivos de Microsoft Word.
-- openpyxl: Para interactuar con archivos de Microsoft Excel.
-- Beautiful Soup (bs4): Para extraer datos de archivos HTML.
-- odfpy: Para trabajar con archivos ODT (Open Document Text).
-- json: Para manejar archivos JSON.
-- os: Para interactuar con el sistema operativo y manejar rutas de archivo.
+    - Conexión a la base de datos en el archivo conexion.py: 
+        - mysql-connector-python: Este módulo te permite conectar tu aplicación Python a una base de datos MySQL. Puedes instalarlo usando pip:
+         ```bash pip3 install mysql-connector-python ```
+        - json: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
+        - tkinter.messagebox: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
+        - webbrowser: Este módulo es parte de la biblioteca estándar de Python y generalmente no requiere instalación adicional.
+
+    - Interfaz gráfica (Tkinter):
+        - En sistemas basados en Debian/Ubuntu: ```bash sudo apt-get install python3-tk ```
+        - En sistemas basados en Fedora: ```bash sudo dnf install python3-tkinter ```
+        - En sistemas basados en Windows y macOS, no se requiere ninguna instalación adicional, ya que Tkinter generalmente se instala junto con Python.
+
+    - Imágenes (Pillow):
+        - Ejecuta: ```bash pip3 install Pillow ``` para instalar la biblioteca Pillow. 
+
+    - Manipulación de archivos de diferentes formatos:
+        - Para PyPDF2: ```bash pip3 install PyPDF2 ```
+        - Para docx: ```bash pip3 install python-docx```
+        - Para openpyxl: ```bash pip3 install openpyxl```
+        - Para BeautifulSoup: ```bash pip3 install beautifulsoup4```
+
+    - Exportar a CSV y PDF:
+        - Para CSV (incluido en la biblioteca estándar de Python): No se requiere instalación adicional.
+        - Para FPDF: ```bash pip3 install fpdf```
+
+Asegúrate de tener Python y pip instalados en tu sistema antes de ejecutar los comandos de instalación mencionados anteriormente. Puedes encontrar más información sobre cómo instalar Python y pip en la documentación oficial de Python: https://www.python.org/doc/.
 
 Asegúrate de tener instaladas todas estas dependencias en tu entorno de Python para que el proyecto funcione correctamente. Puedes instalarlas usando pip, el gestor de paquetes de Python, ejecutando "pip install nombre_del_paquete".
 Este script lo he generado utilizando Python 3.10.12 en Ubuntu. Pero me imagino que si cumples las dependencias necesarias que mencioné antes, funcionará en cualquier sistema.

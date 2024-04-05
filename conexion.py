@@ -8,8 +8,8 @@ def conectar_bd():
     # Conectar a la base de datos MySQL. Aquí hay que configurar los datos de tu conexión a la BD
     conn = mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="36159152",
+        user="XXXX",
+        password="XXXX",
         database="extraccion_datos"
     )
     return conn
@@ -23,7 +23,8 @@ def insertar_en_bd_desde_json():
         cursor.execute('''CREATE TABLE IF NOT EXISTS datos (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             archivo VARCHAR(255),
-                            contenido TEXT)''')
+                            contenido TEXT,
+                            notas VARCHAR(255))''')
         
         # Leer datos del archivo JSON
         with open('porcion.json', 'r') as f:
@@ -59,7 +60,7 @@ def obtener_contenido_bd():
         conn = conectar_bd()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT archivo, contenido FROM datos")
+        cursor.execute("SELECT archivo, contenido, notas FROM datos")
         registros = cursor.fetchall()
 
         conn.close()
@@ -82,18 +83,21 @@ def abrir_google_maps(latitud, longitud):
         
         
 def obtener_coordenadas(contenido):
-    # Buscar el formato de coordenadas en el contenido
-    index_latitud = contenido.find("Coordenadas:")
-    if index_latitud == -1:
-        index_latitud = contenido.find("coordenadas:")
-    if index_latitud != -1:
-        index_coma = contenido.find(",", index_latitud)
-        if index_coma != -1:
-            # Extraer la latitud y la longitud
-            latitud = contenido[index_latitud + len("Coordenadas:"):index_coma].strip()
-            longitud = contenido[index_coma + 1:].strip()
-            return latitud, longitud
-    return None, None
+    # Dividir el contenido en líneas
+    lineas = contenido.split('\n')
+    for linea in lineas:
+        # Buscar la línea que contiene las coordenadas
+        if "Coordenadas:" in linea or "coordenadas:" in linea:
+            # Dividir la línea en partes usando ':'
+            partes = linea.split(':')
+            if len(partes) == 2:  # Verificar si hay dos partes separadas por ':'
+                # Obtener las coordenadas de latitud y longitud
+                coordenadas = partes[1].strip()
+                if ',' in coordenadas:
+                    latitud, longitud = coordenadas.split(',')
+                    return latitud.strip(), longitud.strip()
+    return None, None  # Devolver None si no se encuentran coordenadas
+
 
 # Función para guardar la nota en la base de datos
 def guardar_nota_en_bd(archivo, nota):
@@ -101,7 +105,7 @@ def guardar_nota_en_bd(archivo, nota):
         conn = conectar_bd()
         cursor = conn.cursor()
         # Actualizar la nota en la base de datos
-        cursor.execute("UPDATE datos SET nota = %s WHERE archivo = %s", (nota, archivo))
+        cursor.execute("UPDATE datos SET notas = %s WHERE archivo = %s", (nota, archivo))
         conn.commit()
         conn.close()
         messagebox.showinfo("Nota Guardada", "Nota guardada en la base de datos.")
@@ -114,7 +118,7 @@ def obtener_nota_desde_bd(archivo):
         conn = conectar_bd()
         cursor = conn.cursor()
         # Obtener la nota desde la base de datos
-        cursor.execute("SELECT nota FROM datos WHERE archivo = %s", (archivo,))
+        cursor.execute("SELECT notas FROM datos WHERE archivo = %s", (archivo,))
         nota = cursor.fetchone()
         conn.close()
         if nota:

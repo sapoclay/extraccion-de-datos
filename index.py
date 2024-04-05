@@ -2,11 +2,17 @@
 import conexion
 # Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
-# Importa la biblioteca para abrir el navegador web
-import webbrowser
-
 # Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
 from tkinter import filedialog, messagebox
+
+# Importamos PIL para la imagen
+from PIL import Image, ImageTk
+import requests
+from io import BytesIO
+
+# Importa módulos necesarios para exportar la base de datos a pdf y csv
+import csv
+from fpdf import FPDF  # Instala fpdf usando pip para utilizarlo
 
 # Importa módulos para manejar diferentes tipos de archivos
 import PyPDF2  # Para archivos PDF
@@ -102,8 +108,13 @@ def leer_archivo_html(nombre_archivo):
 # Función para seleccionar una porción de texto y agregarla a un archivo JSON
 def seleccionar_porcion():
     global nombre_archivo
-    contenido = text_box.get("1.0", "end-1c") # Obtiene todo el contenido del cuadro de texto
-    inicio = entry_inicio.get()  # Obtiene la cadena de búsqueda ingresada por el usuario
+    contenido = text_box.get("1.0", "end-1c")  # Obtener todo el contenido del cuadro de texto
+    inicio = entry_inicio.get()  # Obtener la cadena de búsqueda ingresada por el usuario
+
+    if not inicio:
+        # Mostrar mensaje de error si no se ha establecido un campo de búsqueda
+        messagebox.showerror("Error", "Es necesario establecer un campo de búsqueda.")
+        return
 
     if nombre_archivo:
         # Verificar si el texto buscado está presente en el contenido
@@ -152,9 +163,16 @@ def limpiar_busqueda():
     text_box_porcion.delete('1.0', tk.END)  # Borrar contenido de la caja de texto para la porción
 
 def insertar_en_bd_desde_json():
+    global nombre_archivo
+    contenido = text_box_porcion.get("1.0", "end-1c")  # Obtener el contenido de la porción seleccionada
+
+    if not contenido:
+        # Mostrar mensaje de error si no se ha seleccionado ninguna porción
+        messagebox.showerror("Error", "Primero se debe seleccionar un texto desde un archivo.")
+        return
+
     conexion.insertar_en_bd_desde_json()
 
-# Función para mostrar el contenido de la base de datos
 def ver_contenido_bd():
     try:
         registros = conexion.obtener_contenido_bd()
@@ -166,8 +184,9 @@ def ver_contenido_bd():
             scrollbar = tk.Scrollbar(ventana)
             scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-            for archivo, contenido in registros:
-                # Cuadro de texto para mostrar el contenido de cada archivo
+            for registro in registros:
+                archivo, contenido, notas = registro  # Desempaquetar los valores del registro
+                # Cuadro de texto para mostrar el contenido de cada registro
                 text_box_bd = tk.Text(ventana, width=50)
 
                 # Contar el número de líneas en el contenido y ajustar la altura
@@ -177,7 +196,7 @@ def ver_contenido_bd():
                 text_box_bd.pack(pady=5, fill=tk.BOTH, expand=True)  # Rellenar la ventana y expandirse
 
                 # Insertar contenido
-                text_box_bd.insert(tk.END, f"Archivo: {archivo}\nContenido: {contenido}\n\n")
+                text_box_bd.insert(tk.END, f"Archivo: {archivo}\nContenido: {contenido}\nNotas: {notas}\n\n")
 
                 # Verificar si el contenido contiene coordenadas
                 if "Coordenadas:" in contenido or "coordenadas:" in contenido:
@@ -232,19 +251,23 @@ def abrir_ventana_nota(archivo):
     # Función para guardar la nota en la base de datos
     def guardar_nota():
         nota = text_nota.get("1.0", tk.END).strip()
-        if nota:
+        # Verificar si la nota no está vacía antes de guardarla
+        if nota != "":
             # Guardar la nota en la base de datos asociada al archivo
             conexion.guardar_nota_en_bd(archivo, nota)
             ventana_nota.destroy()
         else:
-            messagebox.showwarning("Advertencia", "Por favor, ingresa una nota.")
+            # Mostrar un mensaje de advertencia si la nota está vacía
+            if messagebox.askokcancel("Advertencia", "¿Estás seguro de guardar una nota vacía?"):
+                conexion.guardar_nota_en_bd(archivo, nota)
+                ventana_nota.destroy()
 
     # Verificar si ya existe una nota asociada al archivo en la base de datos
     nota_existente = conexion.obtener_nota_desde_bd(archivo)
 
     # Crear la ventana de agregar nota
     ventana_nota = tk.Toplevel(root)
-    ventana_nota.title("Agregar Nota")
+    ventana_nota.title("Añadir Nota")
 
     # Etiqueta y cuadro de texto para ingresar la nota
     label_nota = tk.Label(ventana_nota, text="Nota:")
@@ -260,16 +283,142 @@ def abrir_ventana_nota(archivo):
     btn_guardar_nota = tk.Button(ventana_nota, text="Guardar Nota", command=guardar_nota)
     btn_guardar_nota.pack(pady=5)
 
+def mostrar_about():
+    # Crear la ventana About
+    ventana_about = tk.Toplevel(root)
+    ventana_about.title("Acerca de")
 
+    # Agregar texto informativo
+    texto = """
+    Extractor de datos\n
+    Autor: entreunosyceros\n
+    Fecha de creación: Abril 2024
+    Versión: 0.9
+    Lenguaje: Python 3
+    Contacto: admin@entreunosyceros.net
+    Licencia: GPL (General Public License)
+    Más información y actualizaciones en: https://github.com/sapoclay/extraccion-de-datos
+    """
 
+    label_info = tk.Label(ventana_about, text=texto, justify="left")
+    label_info.pack(padx=20, pady=10)
+
+    # Descargar la imagen desde la URL
+    url_imagen = "https://entreunosyceros.net/wp-content/uploads/2023/07/entreunosyceros.net-logo-150x150-2.png"
+    response = requests.get(url_imagen)
+    imagen_data = response.content
+
+    # Convertir la imagen descargada a formato compatible con tkinter
+    imagen = Image.open(BytesIO(imagen_data))
+    imagen_tk = ImageTk.PhotoImage(imagen)
+
+    # Mostrar la imagen en un widget Label
+    label_imagen = tk.Label(ventana_about, image=imagen_tk)
+    label_imagen.image = imagen_tk  # Guardar una referencia para evitar que la imagen sea eliminada por el recolector de basura
+    label_imagen.pack(pady=10)
+
+# Función para salir del programa
+def salir_del_programa():
+    root.quit()
 
 # Crear la ventana principal
 root = tk.Tk()
 root.title("Seleccionar información de un Archivo")
 
-# Botón para abrir archivo
-btn_abrir_archivo = tk.Button(root, text="Abrir Archivo", command=leer_archivo)
-btn_abrir_archivo.pack(pady=5)
+
+# Crear el menú principal
+menu_principal = tk.Menu(root)
+root.config(menu=menu_principal)
+
+# Función para abrir archivo desde el menú Archivo
+def abrir_archivo_desde_menu():
+    leer_archivo()
+    
+
+# Función para exportar la base de datos a un archivo CSV
+def exportar_csv():
+    try:
+        # Obtener el contenido de la base de datos
+        registros = conexion.obtener_contenido_bd()
+
+        # Abrir un cuadro de diálogo para guardar el archivo CSV
+        nombre_archivo = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+        if nombre_archivo:
+            with open(nombre_archivo, 'w', newline='', encoding='utf-8') as archivo_csv:
+                # Crear el escritor CSV
+                csv_writer = csv.writer(archivo_csv)
+
+                # Escribir los encabezados
+                csv_writer.writerow(['Archivo', 'Contenido', 'Notas'])
+
+                # Escribir los registros en el archivo CSV
+                for registro in registros:
+                    csv_writer.writerow(registro)
+
+            messagebox.showinfo("Exportación exitosa", "La base de datos se exportó correctamente a un archivo CSV.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al exportar la base de datos a CSV: {str(e)}")
+
+# Función para exportar la base de datos a un archivo PDF
+def exportar_pdf():
+    try:
+        # Obtener el contenido de la base de datos
+        registros = conexion.obtener_contenido_bd()
+
+        # Abrir un cuadro de diálogo para guardar el archivo PDF
+        nombre_archivo = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")])
+        if nombre_archivo:
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+
+            # Escribir los registros en el archivo PDF
+            for i, registro in enumerate(registros):
+                archivo = registro[0] if len(registro) > 0 else ''
+                contenido = registro[1] if len(registro) > 1 else ''
+                notas = registro[2] if len(registro) > 2 else ''
+
+                # Escribir el archivo
+                pdf.cell(0, 10, f"Archivo: {archivo}", ln=True)
+
+                # Escribir el contenido
+                pdf.multi_cell(0, 10, f"Contenido: {contenido}")
+
+                # Escribir las notas
+                pdf.multi_cell(0, 10, f"Notas: {notas}")
+
+                # Agregar una línea horizontal para separar los registros, excepto en el último
+                if i < len(registros) - 1:
+                    pdf.line(10, pdf.get_y(), pdf.w - 10, pdf.get_y())
+
+            pdf.output(nombre_archivo)
+            messagebox.showinfo("Exportación exitosa", "La base de datos se exportó correctamente a un archivo PDF.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al exportar la base de datos a PDF: {str(e)}")
+
+
+
+
+
+# Crear el menú principal
+menu_principal = tk.Menu(root)
+root.config(menu=menu_principal)
+
+# Crear el menú Archivo
+menu_archivo = tk.Menu(menu_principal, tearoff=False)
+menu_principal.add_cascade(label="Archivo", menu=menu_archivo)
+menu_archivo.add_command(label="Abrir Archivo", command=leer_archivo)
+menu_archivo.add_separator()
+menu_archivo.add_command(label="Exportar a CSV", command=exportar_csv)
+menu_archivo.add_command(label="Exportar a PDF", command=exportar_pdf)
+menu_archivo.add_separator()
+menu_archivo.add_command(label="Salir", command=root.quit)
+
+# Crear el menú About
+menu_about = tk.Menu(menu_principal, tearoff=False)
+menu_principal.add_cascade(label="About", menu=menu_about)
+menu_about.add_command(label="Acerca de", command=mostrar_about)
+
 
 # Cuadro de texto para mostrar el contenido del archivo seleccionado
 text_box = tk.Text(root, height=20, width=50) 
