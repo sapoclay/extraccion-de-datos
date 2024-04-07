@@ -1,39 +1,25 @@
-# Importa la conexión a la BD
 import conexion
-# Importamos las funciones para la exportacion de la BD
 import exportarBD
-# Importamos la función para mostrar el menú about
 import mostrar_about
-# Importamos la función para abrir las coordenadas en google maps desde el navegador web
 import google_maps
-# Importa la biblioteca tkinter para crear la interfaz gráfica
 import tkinter as tk
-# Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
 from tkinter import filedialog, messagebox
-
-# Importa módulos para manejar diferentes tipos de archivos
-import PyPDF2  # Para archivos PDF
-import docx  # Para archivos Word
-import openpyxl  # Para archivos Excel
-import json  # Para archivos JSON
-import os  # Para interactuar con el sistema operativo
-
-# Importa módulos para trabajar con otros tipos de archivos
-from odf.opendocument import load  # Para archivos ODT
+import PyPDF2
+import docx
+import openpyxl
+import json
+import os
+from odf.opendocument import load
 from odf import text, teletype
-from bs4 import BeautifulSoup  # Para archivos HTML
+from bs4 import BeautifulSoup
+import tkinter.ttk as ttk  # Importa ttk para usar el widget Separator
 
-
-# Inicializa una variable global para almacenar el nombre del archivo
 nombre_archivo = ""
 
-# Función para leer un archivo y mostrar su contenido en un cuadro de texto
 def leer_archivo():
     global nombre_archivo
-    # Abre un cuadro de diálogo para seleccionar un archivo y almacena su nombre en la variable 'nombre_archivo'
     nombre_archivo = filedialog.askopenfilename()
     try:
-        # Determina el tipo de archivo basado en su extensión y procesa el contenido correspondiente
         if nombre_archivo.endswith('.txt'):
             with open(nombre_archivo, 'r') as archivo:
                 contenido = archivo.read()
@@ -81,7 +67,6 @@ def leer_archivo():
     except FileNotFoundError:
         print("El archivo especificado no se encontró.")
 
-# Función para leer archivos ODT y extraer su contenido
 def leer_archivo_odt(nombre_archivo):
     doc = load(nombre_archivo)
     contenido = ''
@@ -89,66 +74,52 @@ def leer_archivo_odt(nombre_archivo):
         contenido += teletype.extractText(para) + '\n'
     return contenido
 
-# Función para leer archivos CSV y extraer su contenido
 def leer_archivo_csv(nombre_archivo):
     with open(nombre_archivo, 'r') as archivo_csv:
-        contenido = archivo_csv.read() # Lee el contenido del archivo CSV
+        contenido = archivo_csv.read()
     return contenido
 
-# Función para leer archivos HTML y extraer su contenido
 def leer_archivo_html(nombre_archivo):
     with open(nombre_archivo, 'r') as archivo_html:
-        contenido = archivo_html.read() # Lee el contenido del archivo HTML
+        contenido = archivo_html.read()
         soup = BeautifulSoup(contenido, 'html.parser')
-        return soup.get_text() # Devuelve el texto extraído del archivo HTML
+        return soup.get_text()
 
-# Función para seleccionar una porción de texto y agregarla a un archivo JSON
 def seleccionar_porcion():
     global nombre_archivo
-    contenido = text_box.get("1.0", "end-1c")  # Obtener todo el contenido del cuadro de texto
-    inicio = entry_inicio.get()  # Obtener la cadena de búsqueda ingresada por el usuario
+    contenido = text_box.get("1.0", "end-1c")
+    inicio = entry_inicio.get()
 
     if not inicio:
-        # Mostrar mensaje de error si no se ha establecido un campo de búsqueda
         messagebox.showerror("Error", "Es necesario establecer un campo de búsqueda.")
         return
 
     if nombre_archivo:
-        # Verificar si el texto buscado está presente en el contenido
         if inicio in contenido:
-            # Encontrar el índice del siguiente salto de línea después del valor de inicio
             index_fin = contenido.find('\n', contenido.find(inicio))
-
-            # Tomar la porción desde el valor de inicio hasta el siguiente salto de línea o hasta el final del texto
-            if index_fin != -1:  # Si se encuentra un salto de línea después del valor de inicio
+            if index_fin != -1:
                 porcion = contenido[contenido.find(inicio):index_fin]
-            else:  # Si no se encuentra un salto de línea, tomar hasta el final del texto
+            else:
                 porcion = contenido[contenido.find(inicio):]
 
-            # Obtener el nombre del archivo actual sin la extensión
             nombre_archivo_sin_extension = os.path.splitext(os.path.basename(nombre_archivo))[0]
 
-            # Obtener el contenido actual del archivo JSON, si existe
             contenido_json = {}
             if os.path.exists('porcion.json'):
                 with open('porcion.json', 'r') as f:
                     contenido_json = json.load(f)
 
-            # Verificar si ya existe contenido para el archivo actual en el archivo JSON
             if nombre_archivo_sin_extension not in contenido_json:
                 contenido_json[nombre_archivo_sin_extension] = []
 
-            # Agregar la nueva porción al contenido existente para el archivo actual
             contenido_json[nombre_archivo_sin_extension].append(porcion)
 
-            # Guardar el contenido actualizado en el archivo JSON sin codificar en ASCII
             with open('porcion.json', 'w', encoding='utf-8') as f:
                 json.dump(contenido_json, f, ensure_ascii=False, indent=4)
 
             text_box_porcion.delete('1.0', tk.END)
             text_box_porcion.insert(tk.END, porcion)
-            
-            # Mostrar mensaje informativo al usuario
+
             messagebox.showinfo("Búsqueda", "El texto se encontró en el archivo y se copió al archivo JSON.")
         else:
             messagebox.showinfo("Búsqueda", "El texto especificado no se encontró en el archivo.")
@@ -156,204 +127,191 @@ def seleccionar_porcion():
         print("Por favor, abre un archivo primero.")
 
 def limpiar_busqueda():
-    entry_inicio.delete(0, tk.END) # Borra la entrada de búsqueda
-    text_box_porcion.delete('1.0', tk.END)  # Borrar contenido de la caja de texto para la porción
+    entry_inicio.delete(0, tk.END)
+    text_box_porcion.delete('1.0', tk.END)
+    text_box.delete('1.0', tk.END)
 
 def insertar_en_bd_desde_json():
     global nombre_archivo
-    contenido = text_box_porcion.get("1.0", "end-1c")  # Obtener el contenido de la porción seleccionada
+    contenido = text_box_porcion.get("1.0", "end-1c")
 
     if not contenido:
-        # Mostrar mensaje de error si no se ha seleccionado ninguna porción
         messagebox.showerror("Error", "Primero se debe seleccionar un texto desde un archivo.")
         return
 
     conexion.insertar_en_bd_desde_json()
 
-# Variable global para almacenar la referencia a la ventana secundaria
 ventana_contenido_bd = None
 
 def ver_contenido_bd():
     global ventana_contenido_bd
-    
+
     try:
         registros = conexion.obtener_contenido_bd()
         if registros:
-            # Cerrar la ventana secundaria si ya está abierta
             if ventana_contenido_bd:
                 ventana_contenido_bd.destroy()
 
-            # Crear una nueva ventana secundaria para mostrar el contenido de la base de datos
             ventana_contenido_bd = tk.Toplevel(root)
             ventana_contenido_bd.title("Contenido de la Base de Datos")
+            ventana_contenido_bd.geometry("500x500")
 
-            # Crear una barra de desplazamiento vertical para la ventana secundaria
-            scrollbar = tk.Scrollbar(ventana_contenido_bd)
-            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            menu_exportar = tk.Menu(ventana_contenido_bd)
+            ventana_contenido_bd.config(menu=menu_exportar)
+
+            submenu_exportar = tk.Menu(menu_exportar, tearoff=0)
+            menu_exportar.add_cascade(label="Archivo", menu=submenu_exportar)
+            submenu_exportar.add_command(label="Exportar a CSV", command=exportarBD.exportar_csv)
+            submenu_exportar.add_command(label="Exportar a PDF", command=exportarBD.exportar_pdf)
+
+            submenu_exportar.add_separator()
+            submenu_exportar.add_command(label="Cerrar Ventana", command=ventana_contenido_bd.destroy)
+
+            frame_widgets = tk.Frame(ventana_contenido_bd)
+            frame_widgets.pack(fill=tk.BOTH, expand=True)
+
+            scrollbar_y = tk.Scrollbar(frame_widgets, orient="vertical")
+            scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
+
+            inner_frame = tk.Frame(frame_widgets)
+            inner_frame.pack(fill=tk.BOTH, expand=True)
+
+            text_box_frame = tk.Text(inner_frame, wrap="word", yscrollcommand=scrollbar_y.set, state="normal")
+            text_box_frame.pack(fill="both", expand=True)
+
+            scrollbar_y.config(command=text_box_frame.yview)
 
             for registro in registros:
-                archivo, contenido, notas = registro  # Desempaquetar los valores del registro
-                # Cuadro de texto para mostrar el contenido de cada registro
-                text_box_bd = tk.Text(ventana_contenido_bd, width=50)
+                archivo, contenido, notas = registro
 
-                # Contar el número de líneas en el contenido y ajustar la altura
-                num_lineas = contenido.count('\n') + 3
-                text_box_bd.config(height=num_lineas)
+                # Insertar el nombre del archivo en negrita
+                text_box_frame.insert(tk.END, f"Archivo: {archivo}\n", "bold")
+                text_box_frame.tag_configure("bold", font=("Arial", 10, "bold"))
 
-                text_box_bd.pack(pady=5, fill=tk.BOTH, expand=True)  # Rellenar la ventana y expandirse
+                # Insertar el contenido y las notas
+                text_box_frame.insert(tk.END, contenido + "\n")
 
-                # Insertar contenido
-                text_box_bd.insert(tk.END, f"Archivo: {archivo}\n{contenido}")
-
-                # Verificar si hay notas y mostrarlas si existen
                 if notas is not None:
-                    text_box_bd.insert(tk.END, f"\nNota: {notas}\n")
-                else:
-                    text_box_bd.insert(tk.END, "\n")
+                    text_box_frame.insert(tk.END, f"Nota: {notas}\n\n")
 
-                # Verificar si el contenido contiene coordenadas
+                # Insertar botón para ver en Google Maps
                 if "Coordenadas:" in contenido or "coordenadas:" in contenido:
-                    # Obtener las coordenadas
                     latitud, longitud = google_maps.obtener_coordenadas(contenido)
-                    # Mostrar el botón solo si se encuentran coordenadas
                     if latitud and longitud:
-                        btn_abrir_mapa = tk.Button(ventana_contenido_bd, text="Ver Coordenadas en Google Maps",
+                        btn_abrir_mapa = tk.Button(inner_frame, text="Ver en Google Maps",
                                                    command=lambda lat=latitud, lon=longitud: google_maps.abrir_google_maps(lat, lon))
-                        btn_abrir_mapa.pack(pady=5)
+                        text_box_frame.window_create(tk.END, window=btn_abrir_mapa)
+                        text_box_frame.insert(tk.END, "\n")
 
-                # Botón para ver/añadir nota
-                btn_nota = tk.Button(ventana_contenido_bd, text="Ver/Añadir Nota", command=lambda arch=archivo: abrir_ventana_nota(arch))
-                btn_nota.pack(pady=5)
+                # Insertar botón para ver/añadir nota
+                btn_nota = tk.Button(inner_frame, text="Ver/Añadir Nota", command=lambda arch=archivo: abrir_ventana_nota(arch))
+                text_box_frame.window_create(tk.END, window=btn_nota)
+                text_box_frame.insert(tk.END, "\n")
 
-                # Configurar la barra de desplazamiento para que se desplace con el texto
-                text_box_bd.config(yscrollcommand=scrollbar.set)
+                # Insertar línea continua como separador
+                text_box_frame.insert(tk.END, "-"*50 + "\n\n")
 
-            # Configurar la barra de desplazamiento para que se mueva con el texto
-            scrollbar.config(command=text_box_bd.yview)
+                # Cambiar el cursor a flecha al pasar por encima de los botones
+                btn_abrir_mapa.bind("<Enter>", lambda event: btn_abrir_mapa.config(cursor="arrow"))
+                btn_abrir_mapa.bind("<Leave>", lambda event: btn_abrir_mapa.config(cursor=""))
 
-            # Configurar el tamaño de la ventana para que se ajuste automáticamente al contenido
-            ventana_contenido_bd.update_idletasks()  # Actualizar la ventana para obtener el tamaño correcto
-            ventana_contenido_bd.geometry(f"{ventana_contenido_bd.winfo_reqwidth()}x{ventana_contenido_bd.winfo_reqheight()}")
+                btn_nota.bind("<Enter>", lambda event: btn_nota.config(cursor="arrow"))
+                btn_nota.bind("<Leave>", lambda event: btn_nota.config(cursor=""))
+
+            # Deshabilitar la edición del Text
+            text_box_frame.config(state="disabled")
+
         else:
             messagebox.showinfo("Información", "No se encontraron registros en la base de datos.")
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al obtener el contenido de la base de datos: {str(e)}")
 
+
+
+
+
 def abrir_ventana_nota(archivo):
-    # Función para guardar la nota en la base de datos
+    def ajustar_tamano(event):
+        text_nota.config(width=ventana_nota.winfo_width() // 10, height=ventana_nota.winfo_height() // 25)
+
     def guardar_nota():
         nota = text_nota.get("1.0", tk.END).strip()
-        # Verificar si la nota no está vacía antes de guardarla
         if nota != "":
-            # Guardar la nota en la base de datos asociada al archivo
             conexion.guardar_nota_en_bd(archivo, nota)
             ventana_nota.destroy()
-
-            # Cerrar la ventana secundaria actual para evitar la apertura de múltiples ventanas
             if hasattr(root, 'ventana_contenido_bd') and tk.Toplevel in root.ventana_contenido_bd.__class__.__mro__:
                 root.ventana_contenido_bd.destroy()
-
-            # Actualizar la ventana que muestra el contenido de la base de datos
             ver_contenido_bd()
         else:
-            # Mostrar un mensaje de advertencia si la nota está vacía
             if messagebox.askokcancel("Advertencia", "¿Estás seguro de guardar una nota vacía?"):
                 conexion.guardar_nota_en_bd(archivo, nota)
                 ventana_nota.destroy()
-
-                # Cerrar la ventana secundaria actual para evitar la apertura de múltiples ventanas
                 if hasattr(root, 'ventana_contenido_bd') and tk.Toplevel in root.ventana_contenido_bd.__class__.__mro__:
                     root.ventana_contenido_bd.destroy()
-
-                # Actualizar la ventana que muestra el contenido de la base de datos
                 ver_contenido_bd()
 
-    # Verificar si ya existe una nota asociada al archivo en la base de datos
     nota_existente = conexion.obtener_nota_desde_bd(archivo)
 
-    # Crear la ventana de agregar nota
     ventana_nota = tk.Toplevel(root)
-    ventana_nota.title("Añadir Nota")
+    ventana_nota.title(f"Nota para {archivo}")
+    ventana_nota.geometry("400x300")  # Establecer tamaño específico
 
-    # Etiqueta y cuadro de texto para ingresar la nota
     label_nota = tk.Label(ventana_nota, text="Nota:")
     label_nota.pack()
 
-    text_nota = tk.Text(ventana_nota, height=5, width=50)
-    text_nota.pack()
+    text_nota = tk.Text(ventana_nota, wrap="word")
+    text_nota.pack(fill="both", expand=True)
+
+    ventana_nota.bind("<Configure>", ajustar_tamano)
 
     if nota_existente:
         text_nota.insert(tk.END, nota_existente)
 
-    # Botón para guardar la nota
     btn_guardar_nota = tk.Button(ventana_nota, text="Guardar Nota", command=guardar_nota)
     btn_guardar_nota.pack(pady=5)
 
 
 
-# Función para salir del programa
 def salir_del_programa():
     root.quit()
 
-# Crear la ventana principal
 root = tk.Tk()
 root.title("Seleccionar información de un Archivo")
 
-
-# Función para abrir archivo desde el menú Archivo
-def abrir_archivo_desde_menu():
-    leer_archivo(root, text_box)
-    
-# Crear el menú principal
 menu_principal = tk.Menu(root)
 root.config(menu=menu_principal,  borderwidth=0)
 
-# Crear el menú Archivo
 menu_archivo = tk.Menu(menu_principal, tearoff=False, border=0)
 menu_principal.add_cascade(label="Archivo", menu=menu_archivo)
 menu_archivo.add_command(label="Abrir Archivo", command=leer_archivo)
 menu_archivo.add_separator()
-menu_archivo.add_command(label="Exportar a CSV", command=exportarBD.exportar_csv)
-menu_archivo.add_command(label="Exportar a PDF", command=exportarBD.exportar_pdf)
-menu_archivo.add_separator()
 menu_archivo.add_command(label="Salir", command=root.quit)
 
-# Crear el menú About
 menu_about = tk.Menu(menu_principal, tearoff=False)
 menu_principal.add_cascade(label="About", menu=menu_about)
 menu_about.add_command(label="Acerca de", command=mostrar_about.mostrar_about)
 
-
-# Cuadro de texto para mostrar el contenido del archivo seleccionado
 text_box = tk.Text(root, height=20, width=50) 
 text_box.pack(pady=5, fill=tk.BOTH, expand=True)
 
-
-# Etiqueta y entrada para la búsqueda de porciones de texto
 lbl_inicio = tk.Label(root, text="Búsqueda:")
 lbl_inicio.pack()
-entry_inicio = tk.Entry(root)
+entry_inicio = tk.Entry(root, width=30)
 entry_inicio.pack()
 
-# Botón para limpiar la búsqueda
-btn_limpiar_busqueda = tk.Button(root, text="Limpiar Búsqueda", command=limpiar_busqueda)
+btn_limpiar_busqueda = tk.Button(root, text="Limpiar", command=limpiar_busqueda)
 btn_limpiar_busqueda.pack(pady=5)
 
-# Botón para seleccionar porción
 btn_seleccionar_porcion = tk.Button(root, text="Seleccionar Información", command=seleccionar_porcion)
 btn_seleccionar_porcion.pack(pady=5)
 
-# Textbox para mostrar porción seleccionada
 text_box_porcion = tk.Text(root, height=5, width=50)
 text_box_porcion.pack(pady=5, fill=tk.BOTH, expand=True)
 
-# Botón para insertar datos en la base de datos desde el archivo JSON
-btn_insertar_bd_desde_json = tk.Button(root, text="Insertar en Base de Datos desde JSON", command=insertar_en_bd_desde_json)
+btn_insertar_bd_desde_json = tk.Button(root, text="Insertar en Base de Datos", command=insertar_en_bd_desde_json)
 btn_insertar_bd_desde_json.pack(pady=5)
 
-# Botón para ver el contenido de la base de datos
 btn_ver_contenido_bd = tk.Button(root, text="Ver Contenido de la Base de Datos", command=ver_contenido_bd)
 btn_ver_contenido_bd.pack(pady=5)
 
-# Ejecutar la ventana principal
 root.mainloop()

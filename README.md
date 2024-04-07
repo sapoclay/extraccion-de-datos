@@ -34,7 +34,12 @@ En caso de que añadamos el texto de un archivo, después el de otro, y volvamos
 - También se ha corregido el error que aparecía al eliminar una nota ya existente, pues el script no permitía eliminar una nota y dejar este campo vacío. Ahora ya se puede eliminar el contenido de la nota asociada a uno de los registros.
 - Se ha solucionado el problema de que la ventana que muestra el contenido de la base de datos, se actualizaba automáticamente cuando se añadía o se eliminaba una nota.
 
+## 3 Actutalización
 
+- Movidas las opciones de exportación a CSV y PDF al menú de la ventana en la que se consultan los datos guardados en la base de datos.
+- Ahora los cuadros en los que se muestran los datos guardados en la base de datos, son solo de lectura.
+- Modificado el comportamiento de la ventana emergente para añadir notas.
+- Se han modificado el cómo se entregan los resultados guardados en la base de datos.
 ## Dependencias
 Las dependencias necesarias para que funcione este proyecto son:
 

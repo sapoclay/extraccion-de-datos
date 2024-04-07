@@ -1,6 +1,7 @@
 import mysql.connector
 import json
 import tkinter.messagebox as messagebox
+import traceback
 
 def conectar_bd():
     # Conectar a la base de datos MySQL. Aquí hay que configurar los datos de tu conexión a la BD
@@ -41,8 +42,10 @@ def insertar_en_bd_desde_json():
                 for contenido_nuevo in contenidos:
                     if contenido_nuevo not in contenido_existente:
                         nuevo_contenido += "\n" + contenido_nuevo
+                # Actualizar el registro existente en la base de datos
                 cursor.execute("UPDATE datos SET contenido = %s WHERE archivo = %s", (nuevo_contenido, archivo))
             else:
+                # Insertar un nuevo registro en la base de datos
                 cursor.execute("INSERT INTO datos (archivo, contenido) VALUES (%s, %s)", (archivo, "\n".join(contenidos)))
         
         conn.commit()
@@ -51,6 +54,8 @@ def insertar_en_bd_desde_json():
         messagebox.showinfo("Éxito", "Los datos fueron insertados/actualizados en la base de datos correctamente.")
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al insertar/actualizar los datos en la base de datos: {str(e)}")
+        traceback.print_exc()
+
         
 # Función para mostrar el contenido guardado en la base de datos
 def obtener_contenido_bd():
