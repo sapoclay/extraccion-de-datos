@@ -15,13 +15,13 @@ En el momento que quieras escribir los datos en la base de datos, solo es necesa
 de que la tabla (llamado datos) no exista, esta se creará automáticamente. Después se añadirán los datos del archivo json en un registro en la base de datos. Cada registro se va a diferenciar según el nombre del archivo cargado en el programa Python. 
 En caso de que añadamos el texto de un archivo, después el de otro, y volvamos a abrir el primero de los archivos y añadamos más texto a la base de datos, se actualizará el registro de datos del primer archivo, por lo que no deberían generarse duplicados en la base de datos.
 
-## 1 Actualización
+## 1ª Actualización
 
 - He añadido un botón que muestra los datos guardados en la base de datos. Cada registro es independendiente del resto, y dentro del registro (recordemos que están separados por el nombre del archivo desde el que se toman los datos) en caso de que alguno de los datos guardados sea Coordenadas: o coordenadas: se va a generar un botón para abrir las coordenadas en google maps. En caso de que no encuentre entre los datos ninguna de esas referencias a las coordenadas, no se mostrará el botón para ver en google maps.
 - Además, a cada registro de la base de datos, he añadido un nuevo botón para poder dejar notas relacionadas con el registro en cuestión al que esté asociada la nota. En caso de que la nota ya esté creada, al pulsar sobre este botón permitirá leerla.
 - He corregido también la capacidad de estirar o encoger los cuadros de texto en los que se muestra el archivo sobre el que va a trabajar el usuario, y eso también se aplica a los cuadros de texto que muestra el contenido de la base de datos.
 
-## 2 Actualización
+## 2ª Actualización
 
 - Se ha corregido la respuesta de script cuando se pulsa alguno de los botones sin haber abierto un documento de los permitidos. Ahora muestra un error mediante ventana emergente.
 - También se añadió un menú superior. Ahora para abrir un documento hay que ir a la opción Archivo. Se elimino el botón que había en la pantalla principal del script para abrir un archivo.
@@ -34,12 +34,28 @@ En caso de que añadamos el texto de un archivo, después el de otro, y volvamos
 - También se ha corregido el error que aparecía al eliminar una nota ya existente, pues el script no permitía eliminar una nota y dejar este campo vacío. Ahora ya se puede eliminar el contenido de la nota asociada a uno de los registros.
 - Se ha solucionado el problema de que la ventana que muestra el contenido de la base de datos, se actualizaba automáticamente cuando se añadía o se eliminaba una nota.
 
-## 3 Actutalización
+## 3ª Actutalización
 
 - Movidas las opciones de exportación a CSV y PDF al menú de la ventana en la que se consultan los datos guardados en la base de datos.
 - Ahora los cuadros en los que se muestran los datos guardados en la base de datos, son solo de lectura.
 - Modificado el comportamiento de la ventana emergente para añadir notas.
 - Se han modificado el cómo se entregan los resultados guardados en la base de datos.
+
+## 4ª Actualización
+
+- Añadida la opción para personalizar la apariencia. Las opciones de personalización se pueden abrir en la ventana principal, desde el menú de la ventana. Estas opciones personalizan la ventana principal, pero se heredan en las ventanas que se pueden abSrir desde la ventana principal. Como opciones de personalización, se añadieron: Cambiar el color de fondo, Cambiar el tamaño de la fuente y Cambiar la fuente (por el momento las fuentes disponibles son "Arial", "Times New Roman" y "Courier New")
+- Ahora permite exportar el contenido de la BD a un archivo HTML.
+- Añadida la fecha de guardado. Esta se guarda automáticamente al insertar el contenido en la base de datos.
+- Se ha añadido la función para eliminar los registros de la base de datos.
+- Se han reposicionado los botones de la pantalla de inicio.
+- Las opciones der personalización ahora afectan a las ventanas que se abren directamente.
+- Se ha añadido soporte para archivo .JSON y .MD.
+- Simplicada la función leer_archivo.
+- Añadida la opción de búsqueda con resultados múltiples. Ahora si encuentra más de una vez el texto que se busca, permite seleccionar la opción que quieres guardar. Esto se ha creado en una clase independiente.
+- Se ha añadido un botón para poder ver el contenido del archivo JSON antes de insertarlo en la BD.
+- Solucionado el problema de los acentos al ver el archivo JSON.
+- Otras correcciones menores.
+
 ## Dependencias
 Las dependencias necesarias para que funcione este proyecto son:
 

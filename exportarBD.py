@@ -1,10 +1,9 @@
 # Importa módulos necesarios para exportar la base de datos a pdf y csv
 import csv
-from fpdf import FPDF  # Instala fpdf usando pip para utilizarlo
+from fpdf import FPDF  # fpdf usando pip para utilizarlo
 # Importa la conexión a la BD
 import conexion
-# Importa la biblioteca tkinter para crear la interfaz gráfica
-import tkinter as tk
+
 # Importa módulos específicos de tkinter para diálogos de archivo y mensajes emergentes
 from tkinter import filedialog, messagebox
 
@@ -70,3 +69,21 @@ def exportar_pdf():
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al exportar la base de datos a PDF: {str(e)}")
 
+def exportar_contenido_html(registros, nombre_archivo):
+    try:
+        contenido_html = "<!DOCTYPE html><html><head><title>Contenido de la Base de Datos</title></head><body>"
+        for registro in registros:
+            archivo, contenido, notas = registro
+            contenido_html += f"<h3>Archivo: {archivo}</h3>"
+            contenido_html += f"<p>{contenido}</p>"
+            if notas is not None:
+                contenido_html += f"<p><h4>Nota:</h4> {notas}</p>"
+            contenido_html += "<hr>"
+        contenido_html += "</body></html>"
+
+        with open(nombre_archivo, "w", encoding="utf-8") as f:
+            f.write(contenido_html)
+
+        messagebox.showinfo("Exportación exitosa", f"El contenido se exportó correctamente a '{nombre_archivo}'.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al exportar el contenido a HTML: {str(e)}")
