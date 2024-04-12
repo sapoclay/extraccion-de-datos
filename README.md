@@ -5,11 +5,11 @@ hace justamente eso, funciona con archivos: txt, pdf, docx, xlsx, odt, csv y htm
 dentro del archivo en cuestión. Si encuentra lo que busca, se va a seleccionar todo, desde el término de búsqueda utilizado por el usuario (incluido) hasta el primer salto de línea que encuentre. Si el documento no cuenta con saltos de línea al final 
 de cada línea, esto no funcionará. Además el script se va a quedar con la primera aparición del texto buscado, ya que esto se supone que debería funcionar con notas o albaranes donde la info no se repita.
 
-![copiado](https://github.com/sapoclay/extraccion-de-datos/assets/6242827/9d304185-cba4-45e0-bbf7-1e352bea3029)
+![base-de-datos](https://github.com/sapoclay/extraccion-de-datos/assets/6242827/c7e9a59b-f3e6-45a1-bbc7-33d9b4c2a24e)
 
 Una vez encontrado el texto buscado, aparecerá un aviso de que el texto se va a guardar dentro de un archivo .json llamado porcion. Este archivo se va a generar en la misma carpeta en la que ejecutes el archivo python. 
 
-![extraccion-info](https://github.com/sapoclay/extraccion-de-datos/assets/6242827/e6a8c4a5-b7a5-4880-9d7e-0ddf38a38a32)
+![ventanas-abiertas](https://github.com/sapoclay/extraccion-de-datos/assets/6242827/ba1dd44a-bdad-4ebb-94f3-774b63090b8f)
 
 En el momento que quieras escribir los datos en la base de datos, solo es necesario pulsar sobre el botón "Insertar en Base de Datos desde JSON". Los datos de la conexión a la base de datos habrá que definirlos dentro del archivo conexion.py. En caso
 de que la tabla (llamado datos) no exista, esta se creará automáticamente. Después se añadirán los datos del archivo json en un registro en la base de datos. Cada registro se va a diferenciar según el nombre del archivo cargado en el programa Python. 
